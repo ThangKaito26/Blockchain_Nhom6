@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Xác Thực Chứng Chỉ – BlockCert</title>
+  <meta name="description" content="Xác thực tính hợp lệ của chứng chỉ học tập trên Blockchain bằng mã ID, file PDF hoặc quét QR code." />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <!-- ── Navbar ── -->
+  <nav class="navbar">
+    <div class="container">
+      <a href="index.html" class="navbar-brand"><span class="logo">🔐</span><span>BlockCert</span></a>
+      <div class="navbar-nav">
+        <a href="index.html"  class="nav-link">🏠 <span>Trang chủ</span></a>
+        <a href="verify.html" class="nav-link active">🔍 <span>Xác thực</span></a>
+        <a href="admin.html"  class="nav-link">⚙️ <span>Quản trị</span></a>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <div class="container">
+      <!-- ── Page Header ── -->
+      <div class="page-header">
+        <h1>🔍 Xác Thực Chứng Chỉ</h1>
+        <p>Kiểm tra tính hợp lệ của chứng chỉ trực tiếp từ dữ liệu trên Blockchain</p>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;" class="verify-layout">
+        <!-- ── Cột trái: Form xác thực ── -->
+        <div>
+          <div class="glass-card animate-fade-in">
+            <h3 style="margin-bottom:1.5rem;">Chọn phương thức xác thực</h3>
+
+            <!-- Tabs -->
+            <div class="tabs">
+              <div class="tab-list">
+                <button class="tab-btn active" id="tab-id-btn"   onclick="switchVerifyTab('tab-id')">📋 Nhập mã</button>
+                <button class="tab-btn"         id="tab-file-btn" onclick="switchVerifyTab('tab-file')">📄 Upload PDF</button>
+                <button class="tab-btn"         id="tab-qr-btn"   onclick="switchVerifyTab('tab-qr')">📷 Quét QR</button>
+              </div>
+
+              <!-- Tab 1: Nhập mã chứng chỉ -->
+              <div class="tab-pane active" id="tab-id-pane" style="padding-top:1.5rem;">
+                <div class="form-group">
+                  <label class="form-label" for="input-verify-id">Mã chứng chỉ</label>
+                  <input type="text" id="input-verify-id" class="form-input"
+                    placeholder="Ví dụ: CERT-2024-001"
+                    onkeydown="if(event.key==='Enter') verifyByCertId()" />
+                </div>
+                <p style="font-size:.85rem;color:var(--text-secondary);margin-bottom:1rem;">
+                  💡 Nhập mã chứng chỉ được in trên văn bằng hoặc cung cấp bởi cơ sở đào tạo
+                </p>
+                <button id="btn-verify-id" class="btn btn-primary" style="width:100%"
+                  onclick="verifyByCertId()">
+                  🔍 Xác Thực
+                </button>
+              </div>
+
+              <!-- Tab 2: Upload PDF -->
+              <div class="tab-pane" id="tab-file-pane" style="padding-top:1.5rem;">
+                <div class="form-group">
+                  <label class="form-label">File PDF chứng chỉ</label>
+                  <div class="file-drop" id="file-drop-verify"
+                    ondragover="event.preventDefault();this.classList.add('dragover')"
+                    ondragleave="this.classList.remove('dragover')"
+                    ondrop="handleVerifyFileDrop(event)">
+                    <input type="file" id="input-verify-file" accept=".pdf"
+                      onchange="updateFileLabel('input-verify-file','file-drop-verify')" />
+                    <div class="file-drop-icon">📄</div>
+                    <p class="file-drop-text">
+                      <strong>Kéo thả file PDF</strong> vào đây<br/>
+                      hoặc click để chọn file
+                    </p>
+                    <p id="verify-file-name" style="margin-top:.5rem;color:var(--primary);font-size:.85rem;"></p>
+                  </div>
+                </div>
+                <div class="hash-preview" id="verify-hash-preview">
+                  <div class="hash-preview-label">🔐 SHA-256 Hash của file:</div>
+                  <div class="hash-value" id="verify-hash-display"></div>
+                </div>
+                <p style="font-size:.85rem;color:var(--text-secondary);margin-bottom:1rem;">
+                  💡 Hệ thống sẽ tính mã băm SHA-256 của file và so sánh với dữ liệu trên Blockchain
+                </p>
+                <button id="btn-verify-file" class="btn btn-primary" style="width:100%"
+                  onclick="verifyByFile()">
+                  🔍 Xác Thực File
+                </button>
+              </div>
+
+              <!-- Tab 3: Quét QR -->
+              <div class="tab-pane" id="tab-qr-pane" style="padding-top:1.5rem;">
+                <p style="color:var(--text-secondary);margin-bottom:1rem;font-size:.9rem;">
+                  📷 Sử dụng camera để quét mã QR trên chứng chỉ. Hệ thống sẽ tự động xác thực sau khi quét.
+                </p>
+                <button id="btn-scan-qr" class="btn btn-primary" style="width:100%"
+                  onclick="toggleQRScanner()">
+                  📷 Bật Camera Quét QR
+                </button>
+                <div id="qr-scanner-container" style="display:none;margin-top:1rem;">
+                  <div id="qr-reader" style="border-radius:var(--radius-md);overflow:hidden;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Hướng dẫn -->
+          <div class="glass-card" style="margin-top:1.5rem;">
+            <h4 style="margin-bottom:1rem;">📖 Hướng dẫn xác thực</h4>
+            <ol style="list-style:none;display:flex;flex-direction:column;gap:.75rem;">
+              <li style="display:flex;gap:.75rem;align-items:flex-start;">
+                <span style="background:var(--gradient-primary);color:#fff;border-radius:50%;width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;flex-shrink:0;">1</span>
+                <span style="color:var(--text-secondary);font-size:.9rem;">Nhập mã chứng chỉ hoặc upload file PDF gốc</span>
+              </li>
+              <li style="display:flex;gap:.75rem;align-items:flex-start;">
+                <span style="background:var(--gradient-primary);color:#fff;border-radius:50%;width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;flex-shrink:0;">2</span>
+                <span style="color:var(--text-secondary);font-size:.9rem;">Hệ thống tự động truy vấn Blockchain để xác minh</span>
+              </li>
+              <li style="display:flex;gap:.75rem;align-items:flex-start;">
+                <span style="background:var(--gradient-primary);color:#fff;border-radius:50%;width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;flex-shrink:0;">3</span>
+                <span style="color:var(--text-secondary);font-size:.9rem;">Xem kết quả và thông tin chi tiết của chứng chỉ</span>
+              </li>
+            </ol>
+          </div>
+        </div>
+
+        <!-- ── Cột phải: Kết quả ── -->
+        <div>
+          <!-- Placeholder khi chưa xác thực -->
+          <div class="glass-card" id="verify-placeholder" style="text-align:center;padding:3rem;">
+            <div style="font-size:4rem;margin-bottom:1rem;">🔍</div>
+            <h3 style="margin-bottom:.75rem;color:var(--text-secondary);">Chưa có kết quả</h3>
+            <p style="color:var(--text-muted);font-size:.9rem;">Nhập thông tin bên trái để bắt đầu xác thực chứng chỉ</p>
+          </div>
+
+          <!-- Kết quả xác thực (được render bởi app.js) -->
+          <div id="verify-result" class="verify-result"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>🔐 BlockCert – Đồ án môn Blockchain | Nhóm 6</p>
+    </div>
+  </footer>
+
+  <!-- ── CDN Libraries ── -->
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.2/dist/ethers.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+  <!-- ── App Scripts ── -->
+  <script src="js/config.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/app.js"></script>
+
+  <!-- ── Inline helpers cho trang này ── -->
+  <script>
+    // Cập nhật tên file sau khi chọn
+    function updateFileLabel(inputId, dropId) {
+      const input = document.getElementById(inputId);
+      const file  = input.files[0];
+      if (!file) return;
+      document.getElementById('verify-file-name').textContent = '📎 ' + file.name;
+      // Tính hash ngay khi chọn file để preview
+      computeFileHash(file).then(h => {
+        const el = document.getElementById('verify-hash-display');
+        if (el) { el.textContent = h.hex; el.parentElement.style.display = 'block'; }
+      });
+    }
+
+    function handleVerifyFileDrop(event) {
+      event.preventDefault();
+      document.getElementById('file-drop-verify').classList.remove('dragover');
+      const file = event.dataTransfer.files[0];
+      if (!file || file.type !== 'application/pdf') { showToast('Chỉ chấp nhận file PDF!','warning'); return; }
+      const input = document.getElementById('input-verify-file');
+      const dt = new DataTransfer(); dt.items.add(file); input.files = dt.files;
+      updateFileLabel('input-verify-file', 'file-drop-verify');
+    }
+
+    // Ẩn placeholder khi có kết quả
+    const origRender = window.renderVerifyResult;
+    window.renderVerifyResult = function(...args) {
+      const ph = document.getElementById('verify-placeholder');
+      if (ph) ph.style.display = 'none';
+      origRender?.apply(this, args) ?? renderVerifyResult(...args);
+    };
+  </script>
+
+  <!-- Responsive: stack columns on mobile -->
+  <style>
+    @media(max-width:900px){
+      .verify-layout{ grid-template-columns:1fr!important; }
+    }
+  </style>
+</body>
+</html>

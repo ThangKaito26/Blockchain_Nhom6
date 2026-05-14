@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BlockCert – Xác Thực Chứng Chỉ Blockchain</title>
+  <meta name="description" content="Hệ thống cấp và xác thực chứng chỉ học tập trên nền tảng Blockchain Ethereum, đảm bảo tính minh bạch và bất biến." />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <!-- ── Navbar ───────────────────────────────────────────── -->
+  <nav class="navbar">
+    <div class="container">
+      <a href="index.html" class="navbar-brand">
+        <span class="logo">🔐</span>
+        <span>BlockCert</span>
+      </a>
+      <div class="navbar-nav">
+        <a href="index.html"  class="nav-link active">🏠 <span>Trang chủ</span></a>
+        <a href="verify.html" class="nav-link">🔍 <span>Xác thực</span></a>
+        <a href="admin.html"  class="nav-link">⚙️ <span>Quản trị</span></a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ── Hero ─────────────────────────────────────────────── -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-badge animate-fade-in">
+        ⛓️ Powered by Ethereum Blockchain
+      </div>
+      <h1 class="animate-fade-in" style="animation-delay:.1s">
+        Xác Thực Chứng Chỉ<br/>Không Thể Giả Mạo
+      </h1>
+      <p class="hero-subtitle animate-fade-in" style="animation-delay:.2s">
+        Hệ thống cấp và xác thực chứng chỉ học tập trên nền tảng Blockchain.
+        Dữ liệu minh bạch, bất biến, và có thể kiểm chứng bởi bất kỳ ai.
+      </p>
+      <div class="hero-actions animate-fade-in" style="animation-delay:.3s">
+        <a href="verify.html" class="btn btn-primary btn-lg">🔍 Xác Thực Ngay</a>
+        <a href="admin.html"  class="btn btn-ghost btn-lg">⚙️ Dành cho Admin</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Stats ─────────────────────────────────────────────── -->
+  <section style="padding: 0 0 4rem;">
+    <div class="container">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-value">SHA-256</div>
+          <div class="stat-label">🔐 Thuật toán mã băm</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">IPFS</div>
+          <div class="stat-label">📦 Lưu trữ phi tập trung</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">EVM</div>
+          <div class="stat-label">⛓️ Nền tảng Blockchain</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">0ms</div>
+          <div class="stat-label">⚡ Giả mạo được</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Tính năng ─────────────────────────────────────────── -->
+  <section class="section" style="padding-top: 2rem;">
+    <div class="container">
+      <div class="section-header">
+        <h2>Tại sao chọn <span class="gradient-text">BlockCert</span>?</h2>
+        <p>Ứng dụng công nghệ Blockchain để giải quyết bài toán chứng chỉ giả mạo trong giáo dục</p>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">🔗</div>
+          <h3>Dữ liệu bất biến</h3>
+          <p>Một khi đã ghi lên Blockchain, không ai có thể sửa đổi hay xóa dữ liệu chứng chỉ, kể cả admin.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🌐</div>
+          <h3>Minh bạch 100%</h3>
+          <p>Mọi giao dịch cấp/thu hồi chứng chỉ đều công khai, có thể tra cứu trên Blockchain Explorer.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📄</div>
+          <h3>Lưu trữ IPFS</h3>
+          <p>File PDF gốc được lưu trên mạng IPFS phi tập trung, không phụ thuộc vào server trung tâm.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🔐</div>
+          <h3>Xác thực bằng Hash</h3>
+          <p>Dùng SHA-256 để tạo dấu vân tay số của file PDF. Chỉ cần upload file là biết ngay thật hay giả.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📱</div>
+          <h3>QR Code nhanh</h3>
+          <p>Mỗi chứng chỉ có một QR code riêng. Quét bằng điện thoại để xác thực chỉ trong vài giây.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🛡️</div>
+          <h3>Quản lý trạng thái</h3>
+          <p>Admin có thể thu hồi chứng chỉ bất kỳ lúc nào. Trạng thái "Revoked" hiển thị ngay lập tức.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Cách hoạt động ─────────────────────────────────────── -->
+  <section class="section" style="padding: 3rem 0;">
+    <div class="container">
+      <div class="section-header">
+        <h2>Quy trình hoạt động</h2>
+      </div>
+      <div class="features-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px,1fr));">
+        <div class="glass-card" style="text-align:center;">
+          <div style="font-size:2rem;margin-bottom:.75rem;">1️⃣</div>
+          <h3 style="margin-bottom:.5rem;">Admin Upload</h3>
+          <p style="color:var(--text-secondary);font-size:.9rem;">Admin tải file PDF + nhập thông tin người nhận lên hệ thống</p>
+        </div>
+        <div class="glass-card" style="text-align:center;">
+          <div style="font-size:2rem;margin-bottom:.75rem;">2️⃣</div>
+          <h3 style="margin-bottom:.5rem;">Tạo Hash</h3>
+          <p style="color:var(--text-secondary);font-size:.9rem;">JavaScript tính SHA-256 hash của file PDF – dấu vân tay số</p>
+        </div>
+        <div class="glass-card" style="text-align:center;">
+          <div style="font-size:2rem;margin-bottom:.75rem;">3️⃣</div>
+          <h3 style="margin-bottom:.5rem;">Lưu Blockchain</h3>
+          <p style="color:var(--text-secondary);font-size:.9rem;">Hash + thông tin được ghi vĩnh viễn lên Smart Contract</p>
+        </div>
+        <div class="glass-card" style="text-align:center;">
+          <div style="font-size:2rem;margin-bottom:.75rem;">4️⃣</div>
+          <h3 style="margin-bottom:.5rem;">Xác thực</h3>
+          <p style="color:var(--text-secondary);font-size:.9rem;">Người dùng upload file → so sánh hash → kết quả tức thì</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CTA ──────────────────────────────────────────────── -->
+  <section class="section" style="padding: 3rem 0 5rem;">
+    <div class="container" style="text-align:center;">
+      <div class="glass-card" style="max-width:600px;margin:0 auto;">
+        <h2 style="margin-bottom:1rem;">Bắt đầu xác thực ngay</h2>
+        <p style="color:var(--text-secondary);margin-bottom:2rem;">Nhập mã chứng chỉ hoặc upload file PDF để kiểm tra tính xác thực</p>
+        <a href="verify.html" class="btn btn-primary btn-lg">🔍 Xác Thực Chứng Chỉ</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Footer ────────────────────────────────────────────── -->
+  <footer>
+    <div class="container">
+      <p>🔐 BlockCert – Đồ án môn Blockchain | Nhóm 6</p>
+      <p style="margin-top:.5rem;">
+        <a href="verify.html">Xác thực</a> ·
+        <a href="admin.html">Quản trị</a> ·
+        <a href="https://ethereum.org" target="_blank">Ethereum</a> ·
+        <a href="https://ipfs.tech" target="_blank">IPFS</a>
+      </p>
+    </div>
+  </footer>
+</body>
+</html>

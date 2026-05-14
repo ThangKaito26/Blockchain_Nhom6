@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quản Trị Admin – BlockCert</title>
+  <meta name="description" content="Trang quản trị admin: cấp chứng chỉ, thu hồi và tạo QR code." />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <!-- ── Navbar ── -->
+  <nav class="navbar">
+    <div class="container">
+      <a href="index.html" class="navbar-brand"><span class="logo">🔐</span><span>BlockCert</span></a>
+      <div class="navbar-nav">
+        <a href="index.html"  class="nav-link">🏠 <span>Trang chủ</span></a>
+        <a href="verify.html" class="nav-link">🔍 <span>Xác thực</span></a>
+        <a href="admin.html"  class="nav-link active">⚙️ <span>Quản trị</span></a>
+
+        <!-- Wallet Info (hiện sau khi kết nối) -->
+        <div id="wallet-info" style="display:none;align-items:center;gap:.6rem;">
+          <span id="wallet-address" class="wallet-addr"></span>
+          <span id="admin-badge" class="admin-badge" style="display:none;">👑 ADMIN</span>
+        </div>
+
+        <!-- Nút kết nối -->
+        <button id="btn-connect" class="btn-connect-main" onclick="connectWallet()">
+          🦊 Kết nối MetaMask
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <div class="container">
+      <div class="page-header">
+        <h1>⚙️ Quản Trị Chứng Chỉ</h1>
+        <p>Cấp, quản lý và thu hồi chứng chỉ trên Blockchain</p>
+      </div>
+
+      <!-- ── Thông báo chưa kết nối / không phải admin ── -->
+      <div id="not-admin-msg">
+        <div class="icon">🔒</div>
+        <h2 style="margin-bottom:.75rem;">Yêu cầu quyền Admin</h2>
+        <p style="color:var(--text-secondary);margin-bottom:2rem;max-width:480px;margin-left:auto;margin-right:auto;">
+          Chức năng này chỉ dành cho tài khoản Admin (địa chỉ ví đã deploy contract).
+          Vui lòng kết nối MetaMask với đúng tài khoản admin.
+        </p>
+        <button class="btn btn-primary" onclick="connectWallet()">🦊 Kết nối MetaMask</button>
+        <div style="margin-top:2rem;padding:1.25rem;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);max-width:520px;margin-left:auto;margin-right:auto;text-align:left;">
+          <p style="font-weight:600;margin-bottom:.75rem;">📖 Hướng dẫn cho đồ án:</p>
+          <ol style="color:var(--text-secondary);font-size:.875rem;list-style:decimal;padding-left:1.25rem;display:flex;flex-direction:column;gap:.5rem;">
+            <li>Chạy: <code>npx hardhat node</code></li>
+            <li>Deploy: <code>npx hardhat run scripts/deploy.js --network localhost</code></li>
+            <li>Thêm mạng vào MetaMask: RPC <code>http://127.0.0.1:8545</code>, Chain ID <code>31337</code></li>
+            <li>Import private key tài khoản #0 từ output của hardhat node</li>
+          </ol>
+        </div>
+      </div>
+
+      <!-- ── Khu vực Admin (chỉ hiện khi đúng quyền) ── -->
+      <div id="admin-section" style="display:none;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start;" class="admin-layout">
+
+          <!-- ── Cột trái: Form cấp chứng chỉ ── -->
+          <div>
+            <div class="glass-card animate-fade-in">
+              <h3 style="margin-bottom:1.5rem;">🎓 Cấp Chứng Chỉ Mới</h3>
+
+              <form id="issue-form" onsubmit="handleIssueCertificate(event)">
+                <div class="form-group">
+                  <label class="form-label" for="input-cert-id">Mã chứng chỉ *</label>
+                  <input type="text" id="input-cert-id" class="form-input" required
+                    placeholder="Ví dụ: CERT-2024-001" />
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="input-recipient">Tên người nhận *</label>
+                  <input type="text" id="input-recipient" class="form-input" required
+                    placeholder="Ví dụ: Nguyễn Văn A" />
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">File chứng chỉ PDF *</label>
+                  <div class="file-drop" id="file-drop-issue"
+                    ondragover="event.preventDefault();this.classList.add('dragover')"
+                    ondragleave="this.classList.remove('dragover')"
+                    ondrop="handleIssueDrop(event)">
+                    <input type="file" id="input-pdf" accept=".pdf" required
+                      onchange="onPDFSelected()" />
+                    <div class="file-drop-icon">📎</div>
+                    <p class="file-drop-text">
+                      <strong>Kéo thả PDF</strong> vào đây hoặc click chọn
+                    </p>
+                    <p id="pdf-file-name" style="margin-top:.5rem;color:var(--primary);font-size:.85rem;"></p>
+                  </div>
+                </div>
+
+                <!-- Preview hash sau khi chọn file -->
+                <div class="hash-preview" id="issue-hash-preview">
+                  <div class="hash-preview-label">🔐 SHA-256 Hash (sẽ lưu lên Blockchain):</div>
+                  <div class="hash-value" id="hash-display"></div>
+                </div>
+
+                <!-- Status từng bước -->
+                <div id="issue-status"></div>
+
+                <button type="submit" id="btn-issue" class="btn btn-primary" style="width:100%">
+                  🎓 Cấp Chứng Chỉ
+                </button>
+              </form>
+            </div>
+
+            <!-- QR Code kết quả -->
+            <div id="qr-section" class="glass-card" style="margin-top:1.5rem;">
+              <h4 style="margin-bottom:1rem;">📱 QR Code Chứng Chỉ</h4>
+              <p style="color:var(--text-secondary);font-size:.875rem;margin-bottom:.75rem;">
+                Mã: <strong id="qr-cert-id"></strong>
+              </p>
+              <div class="qr-wrapper">
+                <div id="qr-container"></div>
+                <p class="qr-url" id="qr-url-text"></p>
+              </div>
+              <div style="display:flex;gap:.75rem;margin-top:1rem;">
+                <button class="btn btn-outline btn-sm" onclick="copyQRUrl()">📋 Sao chép link</button>
+                <button class="btn btn-ghost btn-sm" onclick="downloadQR()">⬇️ Tải QR</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── Cột phải: Danh sách chứng chỉ ── -->
+          <div>
+            <div class="glass-card animate-fade-in" style="animation-delay:.1s;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;">
+                <h3>📋 Danh Sách Chứng Chỉ
+                  <span id="cert-count" style="background:var(--gradient-primary);color:#fff;padding:.2rem .6rem;border-radius:20px;font-size:.75rem;margin-left:.5rem;"></span>
+                </h3>
+                <button class="btn btn-ghost btn-sm" onclick="loadCertificateList()">🔄 Làm mới</button>
+              </div>
+              <div id="cert-list" class="cert-list">
+                <div class="empty-state">Kết nối ví để xem danh sách...</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ── Modal QR (popup) ── -->
+  <div class="modal-overlay" id="qr-modal" onclick="if(event.target===this)closeModal('qr-modal')">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>📱 QR Code Xác Thực</h3>
+        <button class="modal-close" onclick="closeModal('qr-modal')">✕</button>
+      </div>
+      <p style="color:var(--text-secondary);font-size:.875rem;margin-bottom:1rem;">
+        Mã chứng chỉ: <strong id="modal-cert-id"></strong>
+      </p>
+      <div class="qr-wrapper">
+        <div id="modal-qr-container"></div>
+      </div>
+      <p class="qr-url" id="modal-qr-url" style="margin-top:.75rem;"></p>
+      <div style="display:flex;gap:.75rem;margin-top:1.25rem;">
+        <button class="btn btn-outline btn-sm" style="flex:1" onclick="copyToClipboard(document.getElementById('modal-qr-url').textContent)">📋 Sao chép link</button>
+        <button class="btn btn-ghost btn-sm" onclick="closeModal('qr-modal')">Đóng</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="container">
+      <p>🔐 BlockCert – Đồ án môn Blockchain | Nhóm 6</p>
+    </div>
+  </footer>
+
+  <!-- ── CDN Libraries ── -->
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.2/dist/ethers.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+
+  <!-- ── App Scripts ── -->
+  <script src="js/config.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/app.js"></script>
+
+  <!-- ── Helpers riêng cho admin.html ── -->
+  <script>
+    let lastQRUrl = '';
+
+    // Khi chọn file PDF → tính hash preview
+    function onPDFSelected() {
+      const file = document.getElementById('input-pdf').files[0];
+      if (!file) return;
+      document.getElementById('pdf-file-name').textContent = '📎 ' + file.name;
+      computeFileHash(file).then(h => {
+        const el = document.getElementById('hash-display');
+        if (el) {
+          el.textContent = h.hex;
+          document.getElementById('issue-hash-preview').style.display = 'block';
+        }
+      });
+    }
+
+    function handleIssueDrop(event) {
+      event.preventDefault();
+      document.getElementById('file-drop-issue').classList.remove('dragover');
+      const file = event.dataTransfer.files[0];
+      if (!file || file.type !== 'application/pdf') { showToast('Chỉ chấp nhận PDF!','warning'); return; }
+      const dt = new DataTransfer(); dt.items.add(file);
+      document.getElementById('input-pdf').files = dt.files;
+      onPDFSelected();
+    }
+
+    // Cập nhật QR URL display sau khi tạo QR
+    const _origGenerateQR = generateQRCode;
+    function generateQRCode(elementId, url) {
+      lastQRUrl = url;
+      _origGenerateQR(elementId, url);
+      const urlEl = document.getElementById('qr-url-text');
+      if (urlEl) urlEl.textContent = url;
+    }
+
+    function copyQRUrl() { if(lastQRUrl) copyToClipboard(lastQRUrl); }
+
+    function downloadQR() {
+      const canvas = document.querySelector('#qr-container canvas');
+      if (!canvas) { showToast('Chưa có QR để tải!','warning'); return; }
+      const a = document.createElement('a');
+      a.href = canvas.toDataURL('image/png');
+      a.download = 'qrcode-' + (document.getElementById('qr-cert-id')?.textContent || 'cert') + '.png';
+      a.click();
+    }
+  </script>
+
+  <style>
+    @media(max-width:900px){
+      .admin-layout{ grid-template-columns:1fr!important; }
+    }
+    .wallet-addr {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      padding: .35rem .75rem;
+      border-radius: 20px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .82rem;
+    }
+  </style>
+</body>
+</html>
