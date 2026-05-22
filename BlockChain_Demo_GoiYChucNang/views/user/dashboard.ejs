@@ -1,0 +1,118 @@
+<%- include('../partials/header') %>
+
+<div class="dashboard-container" style="max-width: 1000px; margin: 2rem auto; flex-direction: column;">
+    <div class="glass-panel" style="padding: 2rem; margin-bottom: 2rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h2>Ví Chứng Chỉ Của Tôi</h2>
+                <p class="text-muted">Xin chào, <%= user.FullName %> (<%= user.Email %>)</p>
+            </div>
+            <div>
+                <button id="btnAddCert" class="btn-primary">+ Thêm Chứng Chỉ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Danh sách chứng chỉ -->
+    <div class="grid-certificates">
+        <% if(myCertificates && myCertificates.length > 0) { %>
+            <% myCertificates.forEach(function(cert) { %>
+                <div class="cert-card glass-panel">
+                    <div class="cert-header">
+                        <span class="badge <%= cert.Status === 'Valid' ? 'badge-success' : 'badge-danger' %>">
+                            <%= cert.Status %>
+                        </span>
+                        <span class="text-muted" style="font-size: 0.9rem;">Mã: <%= cert.CertCode %></span>
+                    </div>
+                    <h3><%= cert.CourseName %></h3>
+                    <p><strong>Cấp bởi:</strong> <%= cert.IssuerName %></p>
+                    <p><strong>Cấp ngày:</strong> <%= new Date(cert.IssueDate).toLocaleDateString('vi-VN') %></p>
+                    <div class="cert-actions mt-20">
+                        <a href="https://gateway.pinata.cloud/ipfs/<%= cert.IpfsCID %>" target="_blank" class="btn-secondary-small">Xem PDF Gốc</a>
+                        <a href="/?cert=<%= cert.CertCode %>" class="btn-primary" style="padding: 0.5rem 1rem;">Xác Thực Lại</a>
+                    </div>
+                </div>
+            <% }); %>
+        <% } else { %>
+            <div class="glass-panel" style="padding: 3rem; text-align: center; grid-column: 1 / -1;">
+                <h3 style="color: var(--text-muted)">Ví của bạn đang trống</h3>
+                <p>Nhấn vào nút "Thêm Chứng Chỉ" và nhập mã để lưu chứng chỉ vào ví.</p>
+            </div>
+        <% } %>
+    </div>
+</div>
+
+<!-- Modal Thêm chứng chỉ -->
+<div id="addCertModal" class="modal">
+    <div class="modal-content glass-panel">
+        <span class="close-add">&times;</span>
+        <h2>Thêm Chứng Chỉ Vào Ví</h2>
+        <p class="text-muted mb-20">Nhập mã chứng chỉ mà bạn đã được cấp để lưu trữ vào ví cá nhân.</p>
+        <div class="form-group text-left mt-20">
+            <label>Mã Chứng Chỉ</label>
+            <input type="text" id="inputAddCertCode" class="form-control" placeholder="Ví dụ: CERT-2026-001">
+        </div>
+        <button id="btnSubmitAdd" class="btn-primary w-100 mt-10">Thêm Vào Ví</button>
+        <div id="addResult" class="mt-10"></div>
+    </div>
+</div>
+
+<style>
+    .grid-certificates {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+    }
+    .cert-card {
+        padding: 1.5rem;
+        transition: transform 0.3s;
+    }
+    .cert-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+    .cert-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+    .cert-actions {
+        display: flex;
+        gap: 1rem;
+    }
+    .text-left { text-align: left; }
+    .mb-20 { margin-bottom: 20px; }
+</style>
+
+<script>
+    const modal = document.getElementById('addCertModal');
+    const btn = document.getElementById('btnAddCert');
+    const span = document.querySelector('.close-add');
+
+    if(btn) btn.onclick = () => modal.style.display = "block";
+    if(span) span.onclick = () => modal.style.display = "none";
+    window.onclick = (event) => { if (event.target == modal) modal.style.display = "none"; }
+
+    document.getElementById('btnSubmitAdd').addEventListener('click', async () => {
+        const code = document.getElementById('inputAddCertCode').value;
+        if(!code) return alert("Vui lòng nhập mã chứng chỉ");
+        
+        const res = await fetch('/user/add-certificate', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ certCode: code })
+        });
+        
+        const data = await res.json();
+        const resDiv = document.getElementById('addResult');
+        if(data.success) {
+            resDiv.innerHTML = `<span style="color:var(--success)">${data.message}</span>`;
+            setTimeout(() => window.location.reload(), 1000);
+        } else {
+            resDiv.innerHTML = `<span style="color:var(--danger)">${data.message}</span>`;
+        }
+    });
+</script>
+
+<%- include('../partials/footer') %>

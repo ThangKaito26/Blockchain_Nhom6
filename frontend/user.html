@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ví Chứng Chỉ – BlockCert</title>
+  <meta name="description" content="Ví chứng chỉ cá nhân: xem, quản lý và nhập chứng chỉ đã được cấp trên Blockchain." />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <!-- ── Navbar ── -->
+  <nav class="navbar">
+    <div class="container">
+      <a href="index.html" class="navbar-brand"><span class="logo">🔐</span><span>BlockCert</span></a>
+      <div class="navbar-nav">
+        <a href="index.html"  class="nav-link">🏠 <span>Trang chủ</span></a>
+        <a href="verify.html" class="nav-link">🔍 <span>Xác thực</span></a>
+        <a href="admin.html"  class="nav-link">⚙️ <span>Quản trị</span></a>
+        <a href="user.html"   class="nav-link active">📋 <span>Ví của tôi</span></a>
+
+        <!-- User Info (hiện sau khi đăng nhập) -->
+        <div id="user-info" class="user-info" style="display:none;">
+          <img id="user-avatar" class="user-avatar" src="" alt="avatar" />
+          <span id="user-name" class="user-name"></span>
+          <button id="btn-logout" class="btn-logout" title="Đăng xuất">🚪</button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <div class="container">
+      <!-- ── Loading State ── -->
+      <div id="loading-state" class="loading-spinner" style="padding:4rem;">
+        <div class="spinner"></div> Đang tải...
+      </div>
+
+      <!-- ── Not Logged In ── -->
+      <div id="not-logged-in" style="display:none;text-align:center;padding:4rem 2rem;">
+        <div style="font-size:4rem;margin-bottom:1rem;">🔒</div>
+        <h2 style="margin-bottom:.75rem;">Chưa Đăng Nhập</h2>
+        <p style="color:var(--text-secondary);margin-bottom:2rem;">Vui lòng đăng nhập bằng Google để xem ví chứng chỉ cá nhân.</p>
+        <a href="login.html" class="btn btn-primary btn-lg">🔑 Đăng Nhập</a>
+      </div>
+
+      <!-- ── Dashboard (hiện sau khi đăng nhập) ── -->
+      <div id="dashboard" style="display:none;">
+        <!-- Header -->
+        <div class="page-header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;">
+          <div>
+            <h1>📋 Ví Chứng Chỉ Của Tôi</h1>
+            <p id="user-greeting"></p>
+          </div>
+          <button id="btn-add-cert" class="btn btn-primary" onclick="openAddCertModal()">
+            ➕ Nhập Chứng Chỉ
+          </button>
+        </div>
+
+        <!-- Stats -->
+        <div class="user-stats-grid" style="margin-bottom:2rem;">
+          <div class="stat-card">
+            <div class="stat-value" id="stat-total">0</div>
+            <div class="stat-label">📋 Tổng chứng chỉ</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="stat-valid">0</div>
+            <div class="stat-label">✅ Hợp lệ</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="stat-revoked">0</div>
+            <div class="stat-label">🚫 Đã thu hồi</div>
+          </div>
+        </div>
+
+        <!-- Certificate Grid -->
+        <div id="cert-grid" class="user-cert-grid">
+          <div class="empty-state glass-card" style="grid-column:1/-1;padding:3rem;">
+            <div style="font-size:3rem;margin-bottom:1rem;">📂</div>
+            <h3 style="margin-bottom:.5rem;color:var(--text-secondary);">Ví đang trống</h3>
+            <p style="color:var(--text-muted);font-size:.9rem;">Nhấn <strong>"➕ Nhập Chứng Chỉ"</strong> và nhập mã chứng chỉ đã được cấp để lưu vào ví.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ── Modal: Thêm Chứng Chỉ ── -->
+  <div class="modal-overlay" id="add-cert-modal" onclick="if(event.target===this)closeAddCertModal()">
+    <div class="modal-box" style="max-width:500px;">
+      <div class="modal-header">
+        <h3>➕ Nhập Chứng Chỉ Vào Ví</h3>
+        <button class="modal-close" onclick="closeAddCertModal()">✕</button>
+      </div>
+      <p style="color:var(--text-secondary);font-size:.9rem;margin-bottom:1.5rem;">
+        Nhập mã chứng chỉ mà bạn đã được cấp. Hệ thống sẽ kiểm tra trên Blockchain và lưu vào ví cá nhân của bạn.
+      </p>
+
+      <div class="form-group">
+        <label class="form-label" for="input-add-cert-code">Mã chứng chỉ *</label>
+        <input type="text" id="input-add-cert-code" class="form-input"
+          placeholder="Ví dụ: CERT-2024-001"
+          onkeydown="if(event.key==='Enter')submitAddCert()" />
+      </div>
+
+      <div id="add-cert-preview" style="display:none;margin-bottom:1rem;"></div>
+
+      <div id="add-cert-status" style="margin-bottom:1rem;"></div>
+
+      <button id="btn-submit-add" class="btn btn-primary" style="width:100%" onclick="submitAddCert()">
+        🔍 Kiểm Tra & Thêm Vào Ví
+      </button>
+    </div>
+  </div>
+
+  <footer>
+    <div class="container">
+      <p>🔐 BlockCert – Đồ án môn Blockchain | Nhóm 6</p>
+    </div>
+  </footer>
+
+  <!-- ── CDN Libraries ── -->
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.2/dist/ethers.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
+
+  <!-- ── App Scripts ── -->
+  <script src="js/config.js"></script>
+  <script src="js/utils.js"></script>
+
+  <!-- ── Firebase + Dashboard Logic ── -->
+  <script type="module">
+    import {
+      auth,
+      db,
+      onAuthStateChanged,
+      signOut,
+      collection,
+      addDoc,
+      query,
+      where,
+      getDocs,
+      deleteDoc,
+      doc,
+      onSnapshot,
+      serverTimestamp
+    } from './js/firebase-config.js';
+
+    let currentUser = null;
+    let userCerts = [];
+    let unsubscribeSnapshot = null;
+
+    // ── Auth State ──────────────────────────────────────────
+    onAuthStateChanged(auth, (user) => {
+      document.getElementById('loading-state').style.display = 'none';
+
+      if (user) {
+        currentUser = user;
+        showDashboard(user);
+        listenUserCerts(user.uid);
+      } else {
+        currentUser = null;
+        document.getElementById('not-logged-in').style.display = 'block';
+        document.getElementById('dashboard').style.display = 'none';
+      }
+    });
+
+    function showDashboard(user) {
+      document.getElementById('not-logged-in').style.display = 'none';
+      document.getElementById('dashboard').style.display = 'block';
+
+      // User info in navbar
+      const userInfo = document.getElementById('user-info');
+      userInfo.style.display = 'flex';
+      document.getElementById('user-avatar').src = user.photoURL || '';
+      document.getElementById('user-name').textContent = user.displayName || user.email;
+
+      // Greeting
+      document.getElementById('user-greeting').textContent =
+        `Xin chào, ${user.displayName || user.email} 👋`;
+    }
+
+    // ── Logout ──────────────────────────────────────────────
+    window.handleLogout = async function() {
+      try {
+        if (unsubscribeSnapshot) unsubscribeSnapshot();
+        await signOut(auth);
+        showToast('Đã đăng xuất thành công!', 'success');
+        window.location.href = 'login.html';
+      } catch (error) {
+        showToast('Lỗi đăng xuất: ' + error.message, 'error');
+      }
+    };
+    // Gán sự kiện
+    document.getElementById('btn-logout').addEventListener('click', window.handleLogout);
+
+    // ── Listen Firestore (realtime) ─────────────────────────
+    function listenUserCerts(uid) {
+      const q = query(collection(db, 'userCertificates'), where('userId', '==', uid));
+
+      unsubscribeSnapshot = onSnapshot(q, async (snapshot) => {
+        const certCodes = [];
+        const firestoreDocs = [];
+
+        snapshot.forEach((docSnap) => {
+          const data = docSnap.data();
+          certCodes.push(data.certCode);
+          firestoreDocs.push({ id: docSnap.id, ...data });
+        });
+
+        // Query blockchain for each cert
+        userCerts = [];
+        if (certCodes.length > 0) {
+          const provider = new ethers.JsonRpcProvider(BLOCKCHAIN_CONFIG.localRPC);
+          const readContract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
+
+          for (const certCode of certCodes) {
+            try {
+              const [isValid, isRevoked, data] = await readContract.verifyCertificate(certCode);
+              if (data.exists) {
+                userCerts.push({
+                  certCode,
+                  recipientName: data.recipientName,
+                  issuedAt: data.issuedAt,
+                  isRevoked: data.isRevoked,
+                  ipfsHash: data.ipfsHash,
+                  fileHash: data.fileHash,
+                  issuedBy: data.issuedBy,
+                  exists: data.exists,
+                  firestoreId: firestoreDocs.find(d => d.certCode === certCode)?.id
+                });
+              }
+            } catch (e) {
+              console.warn(`Cannot fetch cert ${certCode}:`, e);
+              // Cert may not exist on blockchain anymore
+              userCerts.push({
+                certCode,
+                exists: false,
+                firestoreId: firestoreDocs.find(d => d.certCode === certCode)?.id
+              });
+            }
+          }
+        }
+
+        renderCertGrid();
+        updateStats();
+      });
+    }
+
+    // ── Render Certificate Grid ─────────────────────────────
+    function renderCertGrid() {
+      const grid = document.getElementById('cert-grid');
+
+      if (userCerts.length === 0) {
+        grid.innerHTML = `
+          <div class="empty-state glass-card" style="grid-column:1/-1;padding:3rem;">
+            <div style="font-size:3rem;margin-bottom:1rem;">📂</div>
+            <h3 style="margin-bottom:.5rem;color:var(--text-secondary);">Ví đang trống</h3>
+            <p style="color:var(--text-muted);font-size:.9rem;">Nhấn <strong>"➕ Nhập Chứng Chỉ"</strong> và nhập mã chứng chỉ đã được cấp để lưu vào ví.</p>
+          </div>`;
+        return;
+      }
+
+      grid.innerHTML = userCerts.map(cert => {
+        if (!cert.exists) {
+          return `
+            <div class="user-cert-card glass-card" style="opacity:.5;">
+              <div class="user-cert-header">
+                <span class="cert-id">${cert.certCode}</span>
+                <span class="cert-status status-revoked">❓ Không tìm thấy</span>
+              </div>
+              <div class="user-cert-body">
+                <p style="color:var(--text-muted);font-size:.9rem;">Chứng chỉ này không tồn tại trên Blockchain.</p>
+              </div>
+              <div class="user-cert-actions">
+                <button class="btn btn-sm btn-danger" onclick="removeCert('${cert.firestoreId}')">🗑️ Xóa</button>
+              </div>
+            </div>`;
+        }
+
+        const statusClass = cert.isRevoked ? 'status-revoked' : 'status-valid';
+        const statusText = cert.isRevoked ? '🚫 Đã thu hồi' : '✅ Hợp lệ';
+        const cardClass = cert.isRevoked ? 'revoked' : 'valid';
+
+        return `
+          <div class="user-cert-card glass-card ${cardClass}">
+            <div class="user-cert-header">
+              <span class="cert-id">${cert.certCode}</span>
+              <span class="cert-status ${statusClass}">${statusText}</span>
+            </div>
+            <div class="user-cert-body">
+              <div class="cert-field"><span>👤 Người nhận:</span> <strong>${cert.recipientName}</strong></div>
+              <div class="cert-field"><span>📅 Ngày cấp:</span> ${formatDate(cert.issuedAt)}</div>
+              <div class="cert-field"><span>🏛️ Cấp bởi:</span> <code>${cert.issuedBy?.slice(0,6)}...${cert.issuedBy?.slice(-4)}</code></div>
+              <div class="cert-field"><span>🔗 IPFS:</span>
+                <a href="${PINATA_CONFIG.gateway}${cert.ipfsHash}" target="_blank" class="ipfs-link">
+                  ${cert.ipfsHash?.slice(0, 16)}...
+                </a>
+              </div>
+            </div>
+            <div class="user-cert-actions">
+              <a href="verify.html?certId=${encodeURIComponent(cert.certCode)}" class="btn btn-sm btn-outline">🔍 Xác thực</a>
+              <button class="btn btn-sm btn-ghost" onclick="removeCert('${cert.firestoreId}')">🗑️ Xóa khỏi ví</button>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    // ── Update Stats ────────────────────────────────────────
+    function updateStats() {
+      const existing = userCerts.filter(c => c.exists);
+      document.getElementById('stat-total').textContent = existing.length;
+      document.getElementById('stat-valid').textContent = existing.filter(c => !c.isRevoked).length;
+      document.getElementById('stat-revoked').textContent = existing.filter(c => c.isRevoked).length;
+    }
+
+    // ── Add Certificate ─────────────────────────────────────
+    window.submitAddCert = async function() {
+      const code = document.getElementById('input-add-cert-code').value.trim();
+      if (!code) { showToast('Vui lòng nhập mã chứng chỉ!', 'warning'); return; }
+      if (!currentUser) { showToast('Vui lòng đăng nhập!', 'error'); return; }
+
+      const btn = document.getElementById('btn-submit-add');
+      const statusEl = document.getElementById('add-cert-status');
+      const previewEl = document.getElementById('add-cert-preview');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Đang kiểm tra...';
+
+      try {
+        // Check duplicate
+        const dupQuery = query(
+          collection(db, 'userCertificates'),
+          where('userId', '==', currentUser.uid),
+          where('certCode', '==', code)
+        );
+        const dupSnap = await getDocs(dupQuery);
+        if (!dupSnap.empty) {
+          statusEl.innerHTML = '<span style="color:var(--warning);">⚠️ Chứng chỉ này đã có trong ví!</span>';
+          btn.disabled = false;
+          btn.innerHTML = '🔍 Kiểm Tra & Thêm Vào Ví';
+          return;
+        }
+
+        // Verify on blockchain
+        const provider = new ethers.JsonRpcProvider(BLOCKCHAIN_CONFIG.localRPC);
+        const readContract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
+
+        const [isValid, isRevoked, data] = await readContract.verifyCertificate(code);
+
+        if (!data.exists) {
+          statusEl.innerHTML = '<span style="color:var(--danger);">❌ Không tìm thấy chứng chỉ này trên Blockchain!</span>';
+          previewEl.style.display = 'none';
+          btn.disabled = false;
+          btn.innerHTML = '🔍 Kiểm Tra & Thêm Vào Ví';
+          return;
+        }
+
+        // Show preview
+        previewEl.style.display = 'block';
+        previewEl.innerHTML = `
+          <div class="glass-card" style="padding:1rem;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem;">
+              <strong>${data.certId}</strong>
+              <span class="cert-status ${data.isRevoked ? 'status-revoked' : 'status-valid'}">
+                ${data.isRevoked ? '🚫 Thu hồi' : '✅ Hợp lệ'}
+              </span>
+            </div>
+            <div class="cert-field"><span>👤</span> ${data.recipientName}</div>
+            <div class="cert-field"><span>📅</span> ${formatDate(data.issuedAt)}</div>
+          </div>`;
+
+        // Save to Firestore
+        await addDoc(collection(db, 'userCertificates'), {
+          userId: currentUser.uid,
+          certCode: code,
+          recipientName: data.recipientName,
+          addedAt: serverTimestamp()
+        });
+
+        statusEl.innerHTML = '<span style="color:var(--accent);">✅ Đã thêm chứng chỉ vào ví!</span>';
+        showToast(`✅ Đã thêm ${code} vào ví!`, 'success');
+        document.getElementById('input-add-cert-code').value = '';
+
+        // Auto close after 1.5s
+        setTimeout(() => {
+          closeAddCertModal();
+          statusEl.innerHTML = '';
+          previewEl.style.display = 'none';
+        }, 1500);
+
+      } catch (error) {
+        console.error(error);
+        statusEl.innerHTML = `<span style="color:var(--danger);">❌ Lỗi: ${error.message}</span>`;
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '🔍 Kiểm Tra & Thêm Vào Ví';
+      }
+    };
+
+    // ── Remove Certificate from wallet ──────────────────────
+    window.removeCert = async function(firestoreId) {
+      if (!firestoreId) return;
+      if (!confirm('Xóa chứng chỉ này khỏi ví cá nhân?')) return;
+
+      try {
+        await deleteDoc(doc(db, 'userCertificates', firestoreId));
+        showToast('Đã xóa khỏi ví!', 'success');
+      } catch (error) {
+        showToast('Lỗi: ' + error.message, 'error');
+      }
+    };
+
+    // ── Modal Controls ──────────────────────────────────────
+    window.openAddCertModal = function() {
+      document.getElementById('add-cert-modal').style.display = 'flex';
+      document.getElementById('input-add-cert-code').focus();
+      document.getElementById('add-cert-status').innerHTML = '';
+      document.getElementById('add-cert-preview').style.display = 'none';
+    };
+    window.closeAddCertModal = function() {
+      document.getElementById('add-cert-modal').style.display = 'none';
+    };
+  </script>
+
+  <!-- ── Responsive ── -->
+  <style>
+    .user-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+    @media(max-width:768px) {
+      .user-stats-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</body>
+</html>

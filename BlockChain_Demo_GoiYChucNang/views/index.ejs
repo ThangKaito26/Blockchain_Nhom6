@@ -1,0 +1,58 @@
+<%- include('partials/header') %>
+
+<div class="hero-section">
+    <div class="hero-content">
+        <h1 class="hero-title">Xác Thực Chứng Chỉ <span>Blockchain</span></h1>
+        <p class="hero-subtitle">Minh bạch, An toàn, và Không thể giả mạo. Hệ thống tra cứu chứng chỉ điện tử ứng dụng Web3.</p>
+        
+        <div class="search-container">
+            <div class="tab-buttons">
+                <button class="tab-btn active" onclick="switchTab('code')">Tra theo mã</button>
+                <button class="tab-btn" onclick="switchTab('file')">Upload PDF</button>
+            </div>
+
+            <!-- Tab Mã -->
+            <div id="tab-code" class="tab-content active">
+                <form id="verifyCodeForm" class="search-form">
+                    <input type="text" id="certCodeInput" placeholder="Nhập mã chứng chỉ (VD: CERT-2026-001)" required>
+                    <button type="submit" class="btn-primary">Tra Cứu</button>
+                </form>
+            </div>
+
+            <!-- Tab File -->
+            <div id="tab-file" class="tab-content" style="display: none;">
+                <form id="verifyFileForm" class="search-form">
+                    <input type="file" id="certFileInput" accept=".pdf" required class="file-input">
+                    <button type="submit" class="btn-primary">Xác Thực</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Result Box -->
+        <div id="resultBox" class="result-box hidden">
+            <div id="resultIcon" class="result-icon"></div>
+            <h3 id="resultStatus" class="result-status"></h3>
+            <div id="resultDetails" class="result-details"></div>
+            <div id="blockchainStatus" class="blockchain-status">
+                <span class="loader"></span> Đang kiểm tra Blockchain...
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function switchTab(tab) {
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(content => content.style.display = 'none');
+        
+        if (tab === 'code') {
+            document.querySelector('.tab-buttons button:nth-child(1)').classList.add('active');
+            document.getElementById('tab-code').style.display = 'block';
+        } else {
+            document.querySelector('.tab-buttons button:nth-child(2)').classList.add('active');
+            document.getElementById('tab-file').style.display = 'block';
+        }
+    }
+</script>
+
+<%- include('partials/footer') %>

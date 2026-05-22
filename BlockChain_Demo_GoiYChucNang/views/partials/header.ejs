@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= typeof title !== 'undefined' ? title : 'Hệ Thống Chứng Chỉ Blockchain' %></title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Ethers.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.0/ethers.umd.min.js"></script>
+    <!-- QR Code Gen -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="logo">
+                <span class="logo-icon">🔗</span>
+                BlockCert
+            </a>
+            <div class="nav-links">
+                <% if((typeof user !== 'undefined' && user !== null) || (typeof admin !== 'undefined' && admin !== null)) { %>
+                    <a href="/" class="nav-link">Tra Cứu</a>
+                    
+                    <% if(typeof user !== 'undefined' && user !== null) { %>
+                        <a href="/user/dashboard" class="nav-link">Ví Chứng Chỉ (<%= user.FullName %>)</a>
+                    <% } %>
+                    
+                    <% if(typeof admin !== 'undefined' && admin !== null) { %>
+                        <a href="/admin/dashboard" class="nav-btn">Quản Trị Viên (<%= admin.FullName %>)</a>
+                    <% } %>
+                    
+                    <a href="/logout" class="nav-link text-danger">Đăng Xuất</a>
+                <% } else { %>
+                    <a href="/login" class="nav-btn">Đăng Nhập</a>
+                <% } %>
+            </div>
+        </div>
+    </nav>
+    <main class="main-content">

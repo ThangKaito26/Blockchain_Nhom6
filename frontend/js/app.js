@@ -39,8 +39,7 @@ document.addEventListener("DOMContentLoaded", async () => {
  */
 async function connectWallet() {
   if (typeof window.ethereum === "undefined") {
-    showToast("Vui lòng cài đặt MetaMask để tiếp tục!", "error");
-    window.open("https://metamask.io/download/", "_blank");
+    showToast("MetaMask chưa được cài đặt! Vui lòng cài đặt extension MetaMask trong trình duyệt.", "error");
     return;
   }
 

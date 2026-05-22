@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Đăng Nhập – BlockCert</title>
+  <meta name="description" content="Đăng nhập vào hệ thống BlockCert: Sinh viên đăng nhập Google, Quản trị viên đăng nhập MetaMask." />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <!-- ── Navbar ── -->
+  <nav class="navbar">
+    <div class="container">
+      <a href="index.html" class="navbar-brand"><span class="logo">🔐</span><span>BlockCert</span></a>
+      <div class="navbar-nav">
+        <a href="index.html"  class="nav-link">🏠 <span>Trang chủ</span></a>
+        <a href="verify.html" class="nav-link">🔍 <span>Xác thực</span></a>
+        <a href="admin.html"  class="nav-link">⚙️ <span>Quản trị</span></a>
+        <a href="login.html"  class="nav-link active">🔑 <span>Đăng nhập</span></a>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <div class="container">
+      <div class="page-header" style="text-align:center;border-bottom:none;padding-bottom:0;">
+        <h1>🔑 Đăng Nhập Hệ Thống</h1>
+        <p>Chọn phương thức đăng nhập phù hợp với vai trò của bạn</p>
+      </div>
+
+      <!-- ── Login Card ── -->
+      <div class="login-card-wrapper animate-fade-in">
+        <div class="login-card">
+
+          <!-- ── Cột trái: Sinh viên / Người dùng ── -->
+          <div class="login-panel login-panel-user">
+            <div class="login-panel-icon">🎓</div>
+            <h2>Sinh Viên / Người Dùng</h2>
+            <p class="login-panel-desc">
+              Đăng nhập để xem và quản lý <strong>Ví Chứng Chỉ</strong> điện tử của riêng bạn.
+            </p>
+
+            <button id="btn-google-login" class="btn-google" onclick="handleGoogleLogin()">
+              <svg viewBox="0 0 48 48" width="22" height="22">
+                <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/>
+                <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/>
+                <path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/>
+                <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/>
+              </svg>
+              Đăng nhập với Google
+            </button>
+
+            <div class="login-features">
+              <div class="login-feature-item">📋 Xem ví chứng chỉ cá nhân</div>
+              <div class="login-feature-item">➕ Nhập mã chứng chỉ đã được cấp</div>
+              <div class="login-feature-item">🔍 Xác thực chứng chỉ nhanh</div>
+            </div>
+          </div>
+
+          <!-- ── Divider ── -->
+          <div class="login-divider">
+            <span>HOẶC</span>
+          </div>
+
+          <!-- ── Cột phải: Quản trị viên ── -->
+          <div class="login-panel login-panel-admin">
+            <div class="login-panel-icon">🛡️</div>
+            <h2>Quản Trị Viên</h2>
+            <p class="login-panel-desc">
+              Đăng nhập bằng MetaMask để <strong>cấp phát và quản lý</strong> chứng chỉ trên Blockchain.
+            </p>
+
+            <button id="btn-metamask-login" class="btn-metamask" onclick="handleMetaMaskLogin()">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" alt="MetaMask" width="24" height="24" />
+              Đăng nhập bằng MetaMask
+            </button>
+
+            <div class="login-features">
+              <div class="login-feature-item">🎓 Cấp chứng chỉ mới</div>
+              <div class="login-feature-item">🚫 Thu hồi chứng chỉ</div>
+              <div class="login-feature-item">📱 Tạo QR Code xác thực</div>
+            </div>
+
+            <!-- Status MetaMask -->
+            <div id="metamask-status" class="metamask-status" style="display:none;">
+              <div class="metamask-status-icon">🦊</div>
+              <div>
+                <div id="metamask-status-text"></div>
+                <div id="metamask-status-addr" class="metamask-addr"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Ghi chú ── -->
+      <div class="login-note glass-card animate-fade-in" style="animation-delay:.2s;">
+        <h4>📖 Lưu ý cho đồ án</h4>
+        <ul>
+          <li><strong>Sinh viên:</strong> Cần tài khoản Google để đăng nhập.</li>
+          <li><strong>Admin:</strong> Cần cài đặt extension <a href="https://metamask.io" target="_blank">MetaMask</a> và import tài khoản đã deploy contract.</li>
+          <li>MetaMask kết nối trực tiếp qua trình duyệt – không cần tải thêm.</li>
+          <li>Dữ liệu ví chứng chỉ được lưu trên <strong>Firebase Firestore</strong>.</li>
+        </ul>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>🔐 BlockCert – Đồ án môn Blockchain | Nhóm 6</p>
+    </div>
+  </footer>
+
+  <!-- ── CDN Libraries ── -->
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.2/dist/ethers.umd.min.js"></script>
+
+  <!-- ── App Scripts ── -->
+  <script src="js/config.js"></script>
+  <script src="js/utils.js"></script>
+
+  <!-- ── Firebase Auth (ES Module) ── -->
+  <script type="module">
+    import {
+      auth,
+      googleProvider,
+      onAuthStateChanged,
+      signInWithPopup
+    } from './js/firebase-config.js';
+
+    // Kiểm tra nếu user đã đăng nhập → redirect
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        window.location.href = 'user.html';
+      }
+    });
+
+    // Expose hàm login Google lên window
+    window.handleGoogleLogin = async function() {
+      const btn = document.getElementById('btn-google-login');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Đang đăng nhập...';
+
+      try {
+        const result = await signInWithPopup(auth, googleProvider);
+        showToast(`Xin chào ${result.user.displayName}!`, 'success');
+        // onAuthStateChanged sẽ tự redirect
+      } catch (error) {
+        console.error('Google login error:', error);
+        if (error.code === 'auth/popup-closed-by-user') {
+          showToast('Bạn đã đóng cửa sổ đăng nhập.', 'warning');
+        } else if (error.code === 'auth/popup-blocked') {
+          showToast('Popup bị chặn! Vui lòng cho phép popup.', 'error');
+        } else {
+          showToast('Lỗi đăng nhập: ' + error.message, 'error');
+        }
+        btn.disabled = false;
+        btn.innerHTML = `<svg viewBox="0 0 48 48" width="22" height="22"><path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/><path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/><path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/><path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/></svg> Đăng nhập với Google`;
+      }
+    };
+  </script>
+
+  <!-- ── MetaMask Login (non-module) ── -->
+  <script>
+    async function handleMetaMaskLogin() {
+      if (typeof window.ethereum === 'undefined') {
+        showToast('MetaMask chưa được cài đặt! Vui lòng cài đặt extension MetaMask trong trình duyệt.', 'error');
+        return;
+      }
+
+      const btn = document.getElementById('btn-metamask-login');
+      const statusEl = document.getElementById('metamask-status');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Đang kết nối...';
+
+      try {
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        const account = accounts[0];
+
+        // Hiển thị trạng thái
+        statusEl.style.display = 'flex';
+        document.getElementById('metamask-status-text').textContent = 'Đã kết nối!';
+        document.getElementById('metamask-status-addr').textContent = account.slice(0, 6) + '...' + account.slice(-4);
+
+        // Kiểm tra admin
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        const signer = await provider.getSigner();
+        const contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+
+        let isAdmin = false;
+        try {
+          const ownerAddress = await contract.owner();
+          isAdmin = ownerAddress.toLowerCase() === account.toLowerCase();
+        } catch (e) {
+          console.warn('Cannot check admin role:', e);
+        }
+
+        if (isAdmin) {
+          showToast('👑 Đăng nhập Admin thành công!', 'success');
+          setTimeout(() => window.location.href = 'admin.html', 1000);
+        } else {
+          showToast('⚠️ Tài khoản này không phải Admin. Chuyển đến trang xác thực.', 'warning');
+          setTimeout(() => window.location.href = 'verify.html', 1500);
+        }
+
+      } catch (error) {
+        if (error.code === 4001) {
+          showToast('Bạn đã từ chối kết nối MetaMask.', 'warning');
+        } else {
+          showToast('Lỗi: ' + error.message, 'error');
+        }
+        btn.disabled = false;
+        btn.innerHTML = '<img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" alt="MetaMask" width="24" height="24" /> Đăng nhập bằng MetaMask';
+        statusEl.style.display = 'none';
+      }
+    }
+  </script>
+</body>
+</html>

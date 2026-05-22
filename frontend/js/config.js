@@ -10,7 +10,7 @@
  * Được tự động cập nhật bởi scripts/deploy.js sau khi deploy.
  * Nếu deploy thủ công, hãy paste địa chỉ contract vào đây.
  */
-const CONTRACT_ADDRESS = "0x0000000000000000000000000000000000000000";
+const CONTRACT_ADDRESS = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
 
 /**
  * ABI (Application Binary Interface) của smart contract.
@@ -18,51 +18,100 @@ const CONTRACT_ADDRESS = "0x0000000000000000000000000000000000000000";
  * Được tự động cập nhật bởi scripts/deploy.js.
  */
 const CONTRACT_ABI = [
-  // ── Hàm admin ────────────────────────────────────────────
   {
-    "inputs": [
-      { "internalType": "string",  "name": "_certId",        "type": "string"  },
-      { "internalType": "string",  "name": "_recipientName", "type": "string"  },
-      { "internalType": "bytes32", "name": "_fileHash",      "type": "bytes32" },
-      { "internalType": "string",  "name": "_ipfsHash",      "type": "string"  }
-    ],
-    "name": "issueCertificate",
-    "outputs": [],
+    "inputs": [],
     "stateMutability": "nonpayable",
-    "type": "function"
+    "type": "constructor"
   },
   {
+    "anonymous": false,
     "inputs": [
-      { "internalType": "string", "name": "_certId", "type": "string" }
-    ],
-    "name": "revokeCertificate",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  // ── Hàm xem dữ liệu (view) ───────────────────────────────
-  {
-    "inputs": [
-      { "internalType": "string", "name": "_certId", "type": "string" }
-    ],
-    "name": "verifyCertificate",
-    "outputs": [
-      { "internalType": "bool",   "name": "isValid",   "type": "bool" },
-      { "internalType": "bool",   "name": "isRevoked", "type": "bool" },
       {
-        "components": [
-          { "internalType": "string",  "name": "recipientName", "type": "string"  },
-          { "internalType": "string",  "name": "certId",        "type": "string"  },
-          { "internalType": "bytes32", "name": "fileHash",      "type": "bytes32" },
-          { "internalType": "string",  "name": "ipfsHash",      "type": "string"  },
-          { "internalType": "uint256", "name": "issuedAt",      "type": "uint256" },
-          { "internalType": "address", "name": "issuedBy",      "type": "address" },
-          { "internalType": "bool",    "name": "isRevoked",     "type": "bool"    },
-          { "internalType": "bool",    "name": "exists",        "type": "bool"    }
-        ],
-        "internalType": "struct Certificate.CertificateData",
-        "name": "data",
-        "type": "tuple"
+        "indexed": true,
+        "internalType": "string",
+        "name": "certId",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "recipientName",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "fileHash",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "issuedBy",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "issuedAt",
+        "type": "uint256"
+      }
+    ],
+    "name": "CertificateIssued",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "string",
+        "name": "certId",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "revokedBy",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "revokedAt",
+        "type": "uint256"
+      }
+    ],
+    "name": "CertificateRevoked",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "allCertIds",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getAllCertIds",
+    "outputs": [
+      {
+        "internalType": "string[]",
+        "name": "",
+        "type": "string[]"
       }
     ],
     "stateMutability": "view",
@@ -70,47 +119,56 @@ const CONTRACT_ABI = [
   },
   {
     "inputs": [
-      { "internalType": "bytes32", "name": "_fileHash", "type": "bytes32" }
-    ],
-    "name": "verifyByHash",
-    "outputs": [
-      { "internalType": "string", "name": "certId",   "type": "string" },
-      { "internalType": "bool",   "name": "isValid",  "type": "bool"   },
       {
-        "components": [
-          { "internalType": "string",  "name": "recipientName", "type": "string"  },
-          { "internalType": "string",  "name": "certId",        "type": "string"  },
-          { "internalType": "bytes32", "name": "fileHash",      "type": "bytes32" },
-          { "internalType": "string",  "name": "ipfsHash",      "type": "string"  },
-          { "internalType": "uint256", "name": "issuedAt",      "type": "uint256" },
-          { "internalType": "address", "name": "issuedBy",      "type": "address" },
-          { "internalType": "bool",    "name": "isRevoked",     "type": "bool"    },
-          { "internalType": "bool",    "name": "exists",        "type": "bool"    }
-        ],
-        "internalType": "struct Certificate.CertificateData",
-        "name": "data",
-        "type": "tuple"
+        "internalType": "string",
+        "name": "_certId",
+        "type": "string"
       }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "string", "name": "_certId", "type": "string" }
     ],
     "name": "getCertificate",
     "outputs": [
       {
         "components": [
-          { "internalType": "string",  "name": "recipientName", "type": "string"  },
-          { "internalType": "string",  "name": "certId",        "type": "string"  },
-          { "internalType": "bytes32", "name": "fileHash",      "type": "bytes32" },
-          { "internalType": "string",  "name": "ipfsHash",      "type": "string"  },
-          { "internalType": "uint256", "name": "issuedAt",      "type": "uint256" },
-          { "internalType": "address", "name": "issuedBy",      "type": "address" },
-          { "internalType": "bool",    "name": "isRevoked",     "type": "bool"    },
-          { "internalType": "bool",    "name": "exists",        "type": "bool"    }
+          {
+            "internalType": "string",
+            "name": "recipientName",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "certId",
+            "type": "string"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "fileHash",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "string",
+            "name": "ipfsHash",
+            "type": "string"
+          },
+          {
+            "internalType": "uint256",
+            "name": "issuedAt",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "issuedBy",
+            "type": "address"
+          },
+          {
+            "internalType": "bool",
+            "name": "isRevoked",
+            "type": "bool"
+          },
+          {
+            "internalType": "bool",
+            "name": "exists",
+            "type": "bool"
+          }
         ],
         "internalType": "struct Certificate.CertificateData",
         "name": "",
@@ -123,46 +181,211 @@ const CONTRACT_ABI = [
   {
     "inputs": [],
     "name": "getTotalCertificates",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "getAllCertIds",
-    "outputs": [{ "internalType": "string[]", "name": "", "type": "string[]" }],
-    "stateMutability": "view",
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "_certId",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "_recipientName",
+        "type": "string"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "_fileHash",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "string",
+        "name": "_ipfsHash",
+        "type": "string"
+      }
+    ],
+    "name": "issueCertificate",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
     "inputs": [],
     "name": "owner",
-    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
-  // ── Events ────────────────────────────────────────────────
   {
-    "anonymous": false,
     "inputs": [
-      { "indexed": true,  "internalType": "string",  "name": "certId",        "type": "string"  },
-      { "indexed": false, "internalType": "string",  "name": "recipientName", "type": "string"  },
-      { "indexed": false, "internalType": "bytes32", "name": "fileHash",      "type": "bytes32" },
-      { "indexed": false, "internalType": "address", "name": "issuedBy",      "type": "address" },
-      { "indexed": false, "internalType": "uint256", "name": "issuedAt",      "type": "uint256" }
+      {
+        "internalType": "string",
+        "name": "_certId",
+        "type": "string"
+      }
     ],
-    "name": "CertificateIssued",
-    "type": "event"
+    "name": "revokeCertificate",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
   },
   {
-    "anonymous": false,
     "inputs": [
-      { "indexed": true,  "internalType": "string",  "name": "certId",    "type": "string"  },
-      { "indexed": false, "internalType": "address", "name": "revokedBy", "type": "address" },
-      { "indexed": false, "internalType": "uint256", "name": "revokedAt", "type": "uint256" }
+      {
+        "internalType": "bytes32",
+        "name": "_fileHash",
+        "type": "bytes32"
+      }
     ],
-    "name": "CertificateRevoked",
-    "type": "event"
+    "name": "verifyByHash",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "certId",
+        "type": "string"
+      },
+      {
+        "internalType": "bool",
+        "name": "isValid",
+        "type": "bool"
+      },
+      {
+        "components": [
+          {
+            "internalType": "string",
+            "name": "recipientName",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "certId",
+            "type": "string"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "fileHash",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "string",
+            "name": "ipfsHash",
+            "type": "string"
+          },
+          {
+            "internalType": "uint256",
+            "name": "issuedAt",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "issuedBy",
+            "type": "address"
+          },
+          {
+            "internalType": "bool",
+            "name": "isRevoked",
+            "type": "bool"
+          },
+          {
+            "internalType": "bool",
+            "name": "exists",
+            "type": "bool"
+          }
+        ],
+        "internalType": "struct Certificate.CertificateData",
+        "name": "data",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "_certId",
+        "type": "string"
+      }
+    ],
+    "name": "verifyCertificate",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "isValid",
+        "type": "bool"
+      },
+      {
+        "internalType": "bool",
+        "name": "isRevoked",
+        "type": "bool"
+      },
+      {
+        "components": [
+          {
+            "internalType": "string",
+            "name": "recipientName",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "certId",
+            "type": "string"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "fileHash",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "string",
+            "name": "ipfsHash",
+            "type": "string"
+          },
+          {
+            "internalType": "uint256",
+            "name": "issuedAt",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "issuedBy",
+            "type": "address"
+          },
+          {
+            "internalType": "bool",
+            "name": "isRevoked",
+            "type": "bool"
+          },
+          {
+            "internalType": "bool",
+            "name": "exists",
+            "type": "bool"
+          }
+        ],
+        "internalType": "struct Certificate.CertificateData",
+        "name": "data",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
   }
 ];
 

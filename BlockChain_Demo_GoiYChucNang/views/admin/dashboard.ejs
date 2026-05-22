@@ -1,0 +1,131 @@
+<%- include('../partials/header') %>
+
+<div class="dashboard-container">
+    <aside class="sidebar glass-panel">
+        <div class="admin-profile">
+            <h3>Chào, <%= admin.FullName %></h3>
+            <span class="badge badge-admin"><%= admin.Role %></span>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="#" class="active" onclick="showTab('listTab')">Danh Sách Chứng Chỉ</a></li>
+            <li><a href="#" onclick="showTab('issueTab')">Cấp Chứng Chỉ Mới</a></li>
+            <li><a href="/admin/logout" class="text-danger">Đăng Xuất</a></li>
+        </ul>
+        <div class="wallet-status">
+            <p>Trạng Thái Ví MetaMask:</p>
+            <span id="walletAddressDisplay" class="text-muted">Chưa kết nối</span>
+            <button id="btnConnectWallet" class="btn-metamask-small mt-10">Kết Nối</button>
+        </div>
+    </aside>
+
+    <main class="dashboard-content">
+        <!-- Danh Sách Tab -->
+        <div id="listTab" class="dashboard-tab active">
+            <div class="d-flex justify-between items-center mb-20">
+                <h2>Quản Lý Chứng Chỉ</h2>
+                <div class="search-bar">
+                    <input type="text" id="searchCert" placeholder="Tìm kiếm mã, tên..." class="form-control">
+                </div>
+            </div>
+            
+            <div class="table-responsive glass-panel">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Mã CC</th>
+                            <th>Người Nhận</th>
+                            <th>Ngày Cấp</th>
+                            <th>IPFS CID</th>
+                            <th>Trạng Thái</th>
+                            <th>Thao Tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if(certificates && certificates.length > 0) { %>
+                            <% certificates.forEach(function(cert) { %>
+                                <tr>
+                                    <td><strong><%= cert.CertCode %></strong></td>
+                                    <td><%= cert.RecipientName %></td>
+                                    <td><%= new Date(cert.IssueDate).toLocaleDateString('vi-VN') %></td>
+                                    <td>
+                                        <a href="https://gateway.pinata.cloud/ipfs/<%= cert.IpfsCID %>" target="_blank" class="link">Xem File</a>
+                                    </td>
+                                    <td>
+                                        <span class="badge <%= cert.Status === 'Valid' ? 'badge-success' : 'badge-danger' %>">
+                                            <%= cert.Status %>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <% if(cert.Status === 'Valid') { %>
+                                            <button class="btn-danger-small btn-revoke" data-hash="<%= cert.FileHash %>">Thu Hồi</button>
+                                        <% } %>
+                                        <button class="btn-secondary-small btn-qr" data-code="<%= cert.CertCode %>">QR</button>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        <% } else { %>
+                            <tr><td colspan="6" class="text-center">Chưa có dữ liệu</td></tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Cấp Mới Tab -->
+        <div id="issueTab" class="dashboard-tab" style="display: none;">
+            <div class="glass-panel issue-form-container">
+                <h2>Cấp Phát Chứng Chỉ Mới</h2>
+                <form id="issueForm">
+                    <div class="form-group">
+                        <label>Tên Người Nhận</label>
+                        <input type="text" id="recipientName" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Khóa Học / Nội Dung</label>
+                        <input type="text" id="courseName" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Mã Chứng Chỉ (Tự tạo hoặc nhập)</label>
+                        <input type="text" id="certCode" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Tên Đơn Vị Cấp</label>
+                        <input type="text" id="issuerName" class="form-control" value="Trung Tâm Đào Tạo ABC" required>
+                    </div>
+                    <div class="form-group">
+                        <label>File PDF Chứng Chỉ</label>
+                        <input type="file" id="certPdf" accept=".pdf" class="form-control file-input" required>
+                    </div>
+                    
+                    <div class="issue-steps">
+                        <button type="submit" id="btnPrepareIssue" class="btn-primary w-100">B1: Chuẩn bị & Upload IPFS</button>
+                        <button type="button" id="btnSignMetaMask" class="btn-metamask w-100 mt-10" disabled>B2: Ký Giao Dịch (MetaMask)</button>
+                    </div>
+                    
+                    <div id="issueStatus" class="mt-20"></div>
+                </form>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Modal QR Code -->
+<div id="qrModal" class="modal">
+    <div class="modal-content glass-panel">
+        <span class="close">&times;</span>
+        <h2>Mã QR Chứng Chỉ</h2>
+        <div id="qrcode" class="qr-container"></div>
+        <p id="qrLink" class="mt-10"></p>
+    </div>
+</div>
+
+<script>
+    function showTab(tabId) {
+        document.querySelectorAll('.dashboard-tab').forEach(tab => tab.style.display = 'none');
+        document.querySelectorAll('.sidebar-menu a').forEach(a => a.classList.remove('active'));
+        document.getElementById(tabId).style.display = 'block';
+        event.target.classList.add('active');
+    }
+</script>
+
+<%- include('../partials/footer') %>
