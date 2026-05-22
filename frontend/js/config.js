@@ -414,6 +414,6 @@ const BLOCKCHAIN_CONFIG = {
   chainIdSepolia: 11155111,
 
   // URL trang xác thực (dùng để tạo QR code)
-  // Thay đổi nếu deploy lên server thật
-  verifyBaseUrl: window.location.origin + "/verify.html"
+  // Lấy đường dẫn hiện tại của thư mục chứa frontend
+  verifyBaseUrl: window.location.href.substring(0, window.location.href.lastIndexOf('/')) + "/verify.html"
 };
