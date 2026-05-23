@@ -191,7 +191,7 @@
     window.renderVerifyResult = function(...args) {
       const ph = document.getElementById('verify-placeholder');
       if (ph) ph.style.display = 'none';
-      origRender?.apply(this, args) ?? renderVerifyResult(...args);
+      if (origRender) origRender.apply(this, args);
     };
   </script>
 

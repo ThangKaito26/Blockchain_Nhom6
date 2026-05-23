@@ -436,7 +436,7 @@ async function performVerification(mode, certId, fileHash) {
     renderVerifyResult(isValid, isRevoked, data, foundCertId, fileHash);
 
   } catch (error) {
-    renderVerifyResult(false, false, null, certId || "", fileHash);
+    renderVerifyResult(false, false, null, certId || "", fileHash, error);
     console.error(error);
   } finally {
     setVerifyLoading(false);
@@ -446,9 +446,25 @@ async function performVerification(mode, certId, fileHash) {
 /**
  * Render kết quả xác thực ra giao diện
  */
-function renderVerifyResult(isValid, isRevoked, data, certId, fileHash) {
+function renderVerifyResult(isValid, isRevoked, data, certId, fileHash, error) {
   const resultEl = document.getElementById("verify-result");
   if (!resultEl) return;
+
+  if (error) {
+    resultEl.className = "verify-result result-invalid";
+    resultEl.innerHTML = `
+      <div class="result-header">
+        <div class="result-icon">❌</div>
+        <div>
+          <h3 class="result-title">LỖI TRUY VẤN BLOCKCHAIN</h3>
+          <p class="result-desc">Đã xảy ra lỗi khi kiểm tra dữ liệu từ Blockchain:<br/><code style="word-break: break-all; color: #ff5555; background: rgba(0,0,0,0.2); padding: 0.5rem; display: block; margin-top: 0.5rem; border-radius: 4px;">${error.message || error}</code></p>
+        </div>
+      </div>
+    `;
+    resultEl.style.display = "block";
+    resultEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    return;
+  }
 
   const exists = data && data.exists;
 
