@@ -6,7 +6,7 @@
 
 // ── Biến toàn cục ────────────────────────────────────────────
 let provider = null;   // ethers.js provider (kết nối với MetaMask)
-let signer   = null;   // Người ký giao dịch (tài khoản MetaMask)
+let signer = null;   // Người ký giao dịch (tài khoản MetaMask)
 let contract = null;   // Instance của smart contract
 let currentAccount = null; // Địa chỉ ví hiện tại
 let isAdmin = false;       // Có phải admin không
@@ -123,17 +123,17 @@ async function checkAdminRole() {
  * Cập nhật giao diện theo trạng thái kết nối ví
  */
 function updateWalletUI() {
-  const btnConnect     = document.getElementById("btn-connect");
-  const walletInfo     = document.getElementById("wallet-info");
-  const walletAddress  = document.getElementById("wallet-address");
-  const adminBadge     = document.getElementById("admin-badge");
-  const adminSection   = document.getElementById("admin-section");
-  const notAdminMsg    = document.getElementById("not-admin-msg");
+  const btnConnect = document.getElementById("btn-connect");
+  const walletInfo = document.getElementById("wallet-info");
+  const walletAddress = document.getElementById("wallet-address");
+  const adminBadge = document.getElementById("admin-badge");
+  const adminSection = document.getElementById("admin-section");
+  const notAdminMsg = document.getElementById("not-admin-msg");
 
   if (currentAccount) {
     // Hiện thông tin ví
-    if (btnConnect)   btnConnect.style.display = "none";
-    if (walletInfo)   walletInfo.style.display = "flex";
+    if (btnConnect) btnConnect.style.display = "none";
+    if (walletInfo) walletInfo.style.display = "flex";
     if (walletAddress) walletAddress.textContent = shortenAddress(currentAccount);
 
     // Hiển thị badge ADMIN nếu đúng quyền
@@ -141,13 +141,13 @@ function updateWalletUI() {
 
     // Trang admin: ẩn/hiện khu vực quản trị
     if (adminSection) adminSection.style.display = isAdmin ? "block" : "none";
-    if (notAdminMsg)  notAdminMsg.style.display  = isAdmin ? "none" : "block";
+    if (notAdminMsg) notAdminMsg.style.display = isAdmin ? "none" : "block";
   } else {
     // Chưa kết nối
-    if (btnConnect)  btnConnect.style.display = "flex";
-    if (walletInfo)  walletInfo.style.display = "none";
+    if (btnConnect) btnConnect.style.display = "flex";
+    if (walletInfo) walletInfo.style.display = "none";
     if (adminSection) adminSection.style.display = "none";
-    if (notAdminMsg)  notAdminMsg.style.display  = "block";
+    if (notAdminMsg) notAdminMsg.style.display = "block";
   }
 }
 
@@ -164,10 +164,10 @@ async function handleIssueCertificate(event) {
   if (!isAdmin) { showToast("Bạn không có quyền admin!", "error"); return; }
 
   // Lấy dữ liệu từ form
-  const certId    = document.getElementById("input-cert-id").value.trim();
+  const certId = document.getElementById("input-cert-id").value.trim();
   const recipient = document.getElementById("input-recipient").value.trim();
   const fileInput = document.getElementById("input-pdf");
-  const file      = fileInput.files[0];
+  const file = fileInput.files[0];
 
   if (!certId || !recipient || !file) {
     showToast("Vui lòng điền đầy đủ thông tin!", "warning");
@@ -459,26 +459,26 @@ function renderVerifyResult(isValid, isRevoked, data, certId, fileHash) {
   if (!exists || (!certId && !fileHash)) {
     // Không tìm thấy
     statusClass = "result-invalid";
-    statusIcon  = "❌";
+    statusIcon = "❌";
     statusTitle = "KHÔNG TÌM THẤY CHỨNG CHỈ";
-    statusDesc  = "Mã chứng chỉ hoặc file này không tồn tại trong hệ thống.";
+    statusDesc = "Mã chứng chỉ hoặc file này không tồn tại trong hệ thống.";
   } else if (isRevoked) {
     // Đã thu hồi
     statusClass = "result-revoked";
-    statusIcon  = "🚫";
+    statusIcon = "🚫";
     statusTitle = "CHỨNG CHỈ ĐÃ BỊ THU HỒI";
-    statusDesc  = "Chứng chỉ này đã bị thu hồi và không còn giá trị.";
+    statusDesc = "Chứng chỉ này đã bị thu hồi và không còn giá trị.";
   } else if (isValid) {
     // Hợp lệ
     statusClass = "result-valid";
-    statusIcon  = "✅";
+    statusIcon = "✅";
     statusTitle = "CHỨNG CHỈ HỢP LỆ";
-    statusDesc  = "Chứng chỉ được xác nhận là chính thống và chưa bị thu hồi.";
+    statusDesc = "Chứng chỉ được xác nhận là chính thống và chưa bị thu hồi.";
   } else {
     statusClass = "result-invalid";
-    statusIcon  = "⚠️";
+    statusIcon = "⚠️";
     statusTitle = "CHỨNG CHỈ KHÔNG HỢP LỆ";
-    statusDesc  = "File có thể đã bị giả mạo hoặc sửa đổi.";
+    statusDesc = "File có thể đã bị giả mạo hoặc sửa đổi.";
   }
 
   resultEl.className = `verify-result ${statusClass}`;
@@ -577,7 +577,7 @@ function toggleQRScanner() {
       showToast(`📷 Quét được: ${certId}`, "success");
     },
     // Callback lỗi (bỏ qua để không spam console)
-    () => {}
+    () => { }
   );
 }
 
@@ -588,9 +588,9 @@ function switchVerifyTab(tabId) {
   document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
   document.querySelectorAll(".tab-pane").forEach(pane => pane.classList.remove("active"));
 
-  const btn  = document.getElementById(tabId + "-btn");
+  const btn = document.getElementById(tabId + "-btn");
   const pane = document.getElementById(tabId + "-pane");
-  if (btn)  btn.classList.add("active");
+  if (btn) btn.classList.add("active");
   if (pane) pane.classList.add("active");
 }
 
