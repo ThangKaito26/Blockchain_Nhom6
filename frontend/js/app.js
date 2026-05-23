@@ -406,17 +406,15 @@ async function verifyByFile() {
  * @param {string|null} fileHash  - Mã hash bytes32 (nếu mode=hash)
  */
 async function performVerification(mode, certId, fileHash) {
-  // Khởi tạo read-only contract (không cần ký)
-  if (!provider) {
-    try {
-      provider = new ethers.JsonRpcProvider(BLOCKCHAIN_CONFIG.localRPC);
-    } catch {
-      showToast("Không thể kết nối Blockchain. Vui lòng cài MetaMask.", "error");
-      setVerifyLoading(false);
-      return;
-    }
+  // Khởi tạo read-only contract bằng RPC trực tiếp để tránh phụ thuộc vào mạng MetaMask đang chọn
+  let readProvider;
+  try {
+    readProvider = new ethers.JsonRpcProvider(BLOCKCHAIN_CONFIG.localRPC);
+  } catch (err) {
+    console.error("Lỗi khởi tạo JsonRpcProvider, dùng provider mặc định:", err);
+    readProvider = provider || new ethers.BrowserProvider(window.ethereum);
   }
-  const readContract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, provider);
+  const readContract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, readProvider);
 
   setVerifyLoading(true);
   const resultEl = document.getElementById("verify-result");
